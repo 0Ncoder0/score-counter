@@ -199,6 +199,9 @@ class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+    
+    // 配置静态资源服务
+    this.app.use(express.static(path.join(__dirname, '../web/dist')));
   };
 
   // 设置路由
@@ -277,9 +280,15 @@ class Server {
       res.status(500).json({ success: false, message: "服务器内部错误" });
     });
 
-    // 404处理 - 放在最后
-    this.app.use((req, res) => {
-      res.status(404).json({ success: false, message: "接口不存在" });
+    // 处理前端路由 - 对于所有非API请求，返回index.html
+    this.app.get('*', (req, res) => {
+      // 如果是API请求，返回404
+      if (req.path.startsWith('/rooms') || req.path.startsWith('/health')) {
+        return res.status(404).json({ success: false, message: "接口不存在" });
+      }
+      
+      // 对于其他请求，返回静态文件
+      res.sendFile(path.join(__dirname, '../web/dist/index.html'));
     });
   };
 
