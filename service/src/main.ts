@@ -82,7 +82,7 @@ class Content {
     // 清理磁盘上的过期文件
     try {
       if (!fs.existsSync(Content.DATA_DIR)) return;
-      
+
       const files = fs.readdirSync(Content.DATA_DIR);
       files.forEach((file) => {
         const filePath = path.join(Content.DATA_DIR, file);
@@ -187,7 +187,7 @@ class Server {
   private app: express.Application;
   private port: number;
 
-  constructor(port: number = 80) {
+  constructor(port: number = 3000) {
     this.app = express();
     this.port = port;
     this.setupMiddleware();
@@ -199,9 +199,9 @@ class Server {
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
-    
+
     // 配置静态资源服务
-    this.app.use(express.static(path.join(__dirname, '../web/dist')));
+    this.app.use(express.static("./web/dist"));
   };
 
   // 设置路由
@@ -279,17 +279,6 @@ class Server {
       console.error("服务器错误:", error);
       res.status(500).json({ success: false, message: "服务器内部错误" });
     });
-
-    // 处理前端路由 - 对于所有非API请求，返回index.html
-    this.app.get('*', (req, res) => {
-      // 如果是API请求，返回404
-      if (req.path.startsWith('/rooms') || req.path.startsWith('/health')) {
-        return res.status(404).json({ success: false, message: "接口不存在" });
-      }
-      
-      // 对于其他请求，返回静态文件
-      res.sendFile(path.join(__dirname, '../web/dist/index.html'));
-    });
   };
 
   // 启动服务器
@@ -307,5 +296,5 @@ class Server {
 }
 
 // 启动服务器
-const server = new Server(3000);
+const server = new Server(80);
 server.start();

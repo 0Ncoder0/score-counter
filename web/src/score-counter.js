@@ -1,8 +1,6 @@
 import QRCode from "qrcode";
 
 export class ScoreCounter {
-  BASE_URL = "http://192.168.0.103:3000";
-
   constructor() {
     this.roomId = null;
     this.userId = null;
@@ -333,7 +331,7 @@ export class ScoreCounter {
 
   validateRoom = async () => {
     try {
-      const response = await fetch(`${this.BASE_URL}/rooms/${this.roomId}`);
+      const response = await fetch(`/rooms/${this.roomId}`);
       if (response.ok) {
         const result = await response.json();
         return result.success && result.data;
@@ -348,7 +346,7 @@ export class ScoreCounter {
   createRoom = async () => {
     try {
       // 调用后端创建房间接口
-      const response = await fetch(`${this.BASE_URL}/rooms`, {
+      const response = await fetch(`/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -526,7 +524,7 @@ export class ScoreCounter {
 
     try {
       // 调用后端添加成员接口
-      const response = await fetch(`${this.BASE_URL}/rooms/${this.roomId}/members`, {
+      const response = await fetch(`/rooms/${this.roomId}/members`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -680,7 +678,7 @@ export class ScoreCounter {
 
       const handleConfirm = async () => {
         this.closeModal();
-        
+
         // 停止当前轮询
         this.stopPolling();
 
@@ -728,7 +726,7 @@ export class ScoreCounter {
 
     try {
       // 调用后端获取房间数据接口
-      const response = await fetch(`${this.BASE_URL}/rooms/${this.roomId}`);
+      const response = await fetch(`/rooms/${this.roomId}`);
 
       if (response.ok) {
         const result = await response.json();
@@ -906,7 +904,7 @@ export class ScoreCounter {
 
       this.pendingChanges.forEach((score, memberId) => {
         // 从发起操作的用户转移分数给目标成员
-        const promise = fetch(`${this.BASE_URL}/rooms/${this.roomId}/transfer`, {
+        const promise = fetch(`/rooms/${this.roomId}/transfer`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
