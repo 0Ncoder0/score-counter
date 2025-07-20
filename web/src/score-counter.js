@@ -412,15 +412,15 @@ export class ScoreCounter {
     return new Promise((resolve) => {
       this.isNameInputMode = true; // 设置为输入姓名模式
       this.elements.modalBody.innerHTML = `
-        <h3>欢迎使用积分器</h3>
-        <input type="text" id="nameInput" placeholder="请输入您的昵称（必填）" maxlength="20" autocomplete="off" required>
+        <h3>哟，来都来了，不报个名？</h3>
+        <input type="text" id="nameInput" placeholder="你叫啥？（必填）" maxlength="20" autocomplete="off" required>
         <div style="margin-top: 16px; display: flex; justify-content: center;">
           <button id="confirmName" class="btn btn-primary" disabled style="min-width: 120px;">
             确认加入
           </button>
         </div>
         <div id="nameError" style="display: none; color: #dc3545; font-size: 14px; margin-top: 8px;">
-          请输入有效的昵称
+          名字不能为空
         </div>
       `;
 

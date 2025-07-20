@@ -1,7 +1,7 @@
 {
   "name": "score-counter-web",
   "version": "1.0.0",
-  "description": "积分器前端",
+  "description": "在？点一炮？前端",
   "main": "index.js",
   "scripts": {
     "dev": "webpack serve --mode development",
