@@ -1,5 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
+import express from "express";
+import cors from "cors";
 
 // 工具类，提供通用功能
 class Utils {
@@ -11,9 +13,9 @@ class Utils {
 
 // 成员类，表示参与计分的用户
 class Member {
-  id: string;      // 成员唯一标识
-  name: string;    // 成员姓名
-  score: number;   // 当前分数
+  id: string; // 成员唯一标识
+  name: string; // 成员姓名
+  score: number; // 当前分数
   constructor(name: string) {
     this.id = Utils.createId();
     this.name = name;
@@ -23,9 +25,9 @@ class Member {
 
 // 日志类，记录分数转移历史
 class Log {
-  fromMemberId: string;  // 转出分数的成员ID
-  toMemberId: string;    // 转入分数的成员ID
-  score: number;         // 转移的分数
+  fromMemberId: string; // 转出分数的成员ID
+  toMemberId: string; // 转入分数的成员ID
+  score: number; // 转移的分数
   constructor(fromMemberId: string, toMemberId: string, score: number) {
     this.fromMemberId = fromMemberId;
     this.toMemberId = toMemberId;
@@ -35,9 +37,9 @@ class Log {
 
 // 内容管理类，负责房间数据的存储和检索
 class Content {
-  private static DATA_VERSION = "1.0.0";           // 数据版本号
-  private static DATA_DIR = "data";                // 数据存储目录
-  private static DAYS_TO_KEEP_DATA = 3;            // 数据保留天数
+  private static DATA_VERSION = "1.0.0"; // 数据版本号
+  private static DATA_DIR = "data"; // 数据存储目录
+  private static DAYS_TO_KEEP_DATA = 3; // 数据保留天数
 
   // 内存中的内容缓存
   private static contents: Map<string, Content> = new Map();
@@ -67,7 +69,7 @@ class Content {
   private static cleanUnusedData = () => {
     const now = Date.now();
     const max = Content.DAYS_TO_KEEP_DATA * 24 * 60 * 60 * 1000;
-    
+
     // 清理内存中的过期数据
     Content.contents.forEach((content) => {
       if (now - content.lastAccessTime >= max) Content.contents.delete(content.roomId);
@@ -112,11 +114,11 @@ class Content {
     else return Content.getContentFromDisk(roomId);
   };
 
-  private version: string;           // 数据版本
-  private roomId: string;            // 房间ID
-  private members: Member[];         // 成员列表
-  private logs: Log[];               // 操作日志
-  private lastAccessTime: number;    // 最后访问时间
+  private version: string; // 数据版本
+  private roomId: string; // 房间ID
+  private members: Member[]; // 成员列表
+  private logs: Log[]; // 操作日志
+  private lastAccessTime: number; // 最后访问时间
 
   constructor(options: { noSave?: boolean } = {}) {
     this.version = Content.DATA_VERSION;
@@ -144,11 +146,11 @@ class Content {
     const fromMember = this.members.find((member) => member.id === fromMemberId);
     const toMember = this.members.find((member) => member.id === toMemberId);
     if (!fromMember || !toMember) throw new Error("Member not found");
-    
+
     // 执行分数转移
     fromMember.score -= score;
     toMember.score += score;
-    
+
     // 记录操作日志
     this.logs.push(new Log(fromMemberId, toMemberId, score));
     this.saveContent();
@@ -168,3 +170,122 @@ class Content {
     return this;
   };
 }
+
+// Express服务器类
+class Server {
+  private app: express.Application;
+  private port: number;
+
+  constructor(port: number = 3000) {
+    this.app = express();
+    this.port = port;
+    this.setupMiddleware();
+    this.setupRoutes();
+  }
+
+  // 设置中间件
+  private setupMiddleware = () => {
+    this.app.use(cors());
+    this.app.use(express.json());
+    this.app.use(express.urlencoded({ extended: true }));
+  };
+
+  // 设置路由
+  private setupRoutes = () => {
+    // 健康检查接口
+    this.app.get("/health", (req, res) => {
+      res.json({ status: "ok", timestamp: new Date().toISOString() });
+    });
+
+    // 创建新房间
+    this.app.post("/rooms", (req, res) => {
+      try {
+        const content = new Content();
+        res.json({ success: true, data: content, message: "房间创建成功" });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error instanceof Error ? error.message : "创建房间失败" });
+      }
+    });
+
+    // 获取房间信息
+    this.app.get("/rooms/:roomId", (req, res) => {
+      try {
+        const { roomId } = req.params;
+        const content = Content.getContent(roomId);
+        res.json({ success: true, data: content, message: "房间信息获取成功" });
+      } catch (error) {
+        res.status(404).json({ success: false, message: error instanceof Error ? error.message : "房间不存在" });
+      }
+    });
+
+    // 添加成员
+    this.app.post("/rooms/:roomId/members", (req, res) => {
+      try {
+        const { roomId } = req.params;
+        const { name } = req.body;
+
+        if (!name || typeof name !== "string") {
+          return res.status(400).json({ success: false, message: "成员姓名不能为空" });
+        }
+
+        const content = Content.getContent(roomId);
+        const member = content.addMember(name);
+
+        res.json({ success: true, data: member, message: "成员添加成功" });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error instanceof Error ? error.message : "添加成员失败" });
+      }
+    });
+
+    // 转移分数
+    this.app.post("/rooms/:roomId/transfer", (req, res) => {
+      try {
+        const { roomId } = req.params;
+        const { fromMemberId, toMemberId, score } = req.body;
+
+        if (!fromMemberId || !toMemberId || !score) {
+          return res.status(400).json({ success: false, message: "缺少必要参数" });
+        }
+
+        if (typeof score !== "number" || score <= 0) {
+          return res.status(400).json({ success: false, message: "分数必须为正数" });
+        }
+
+        const content = Content.getContent(roomId);
+        content.transferScore(fromMemberId, toMemberId, score);
+
+        res.json({ success: true, message: "分数转移成功" });
+      } catch (error) {
+        res.status(500).json({ success: false, message: error instanceof Error ? error.message : "分数转移失败" });
+      }
+    });
+
+    // 错误处理中间件
+    this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      console.error("服务器错误:", error);
+      res.status(500).json({ success: false, message: "服务器内部错误" });
+    });
+
+    // 404处理 - 放在最后
+    this.app.use((req, res) => {
+      res.status(404).json({ success: false, message: "接口不存在" });
+    });
+  };
+
+  // 启动服务器
+  public start = () => {
+    this.app.listen(this.port, () => {
+      console.log(`服务器运行在 http://localhost:${this.port}`);
+      console.log("可用的API接口:");
+      console.log("  POST   /rooms                    - 创建新房间");
+      console.log("  GET    /rooms/:roomId            - 获取房间信息");
+      console.log("  POST   /rooms/:roomId/members    - 添加成员");
+      console.log("  POST   /rooms/:roomId/transfer   - 转移分数");
+      console.log("  GET    /health                   - 健康检查");
+    });
+  };
+}
+
+// 启动服务器
+const server = new Server(3000);
+server.start();
