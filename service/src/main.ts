@@ -38,7 +38,7 @@ class Log {
 // 内容管理类，负责房间数据的存储和检索
 class Content {
   private static DATA_VERSION = "1.0.0"; // 数据版本号
-  private static DATA_DIR = "data"; // 数据存储目录
+  private static DATA_DIR = "database"; // 数据存储目录
   private static DAYS_TO_KEEP_DATA = 3; // 数据保留天数
 
   // 内存中的内容缓存
@@ -46,7 +46,11 @@ class Content {
 
   // 检查房间数据文件是否存在
   private static checkExists = (roomId: string) => {
-    return fs.existsSync(path.join(Content.DATA_DIR, `${roomId}.json`));
+    try {
+      return fs.existsSync(path.join(Content.DATA_DIR, `${roomId}.json`));
+    } catch (e) {
+      return false;
+    }
   };
 
   // 创建唯一的房间ID
@@ -76,17 +80,24 @@ class Content {
     });
 
     // 清理磁盘上的过期文件
-    const files = fs.readdirSync(Content.DATA_DIR);
-    files.forEach((file) => {
-      const filePath = path.join(Content.DATA_DIR, file);
-      try {
-        const stats = fs.statSync(filePath);
-        const mtime = stats.mtime.getTime();
-        if (now - mtime >= max) fs.unlinkSync(filePath);
-      } catch (e) {
-        fs.unlinkSync(filePath);
-      }
-    });
+    try {
+      if (!fs.existsSync(Content.DATA_DIR)) return;
+      
+      const files = fs.readdirSync(Content.DATA_DIR);
+      files.forEach((file) => {
+        const filePath = path.join(Content.DATA_DIR, file);
+        try {
+          const stats = fs.statSync(filePath);
+          const mtime = stats.mtime.getTime();
+          if (now - mtime >= max) fs.unlinkSync(filePath);
+        } catch (e) {
+          fs.unlinkSync(filePath);
+        }
+      });
+    } catch (e) {
+      // 如果目录不存在或其他错误，忽略
+      console.log("清理过期数据时出错:", e);
+    }
   };
 
   // 从内存缓存获取内容
