@@ -187,7 +187,7 @@ class Server {
   private app: express.Application;
   private port: number;
 
-  constructor(port: number = 3000) {
+  constructor(port: number = 80) {
     this.app = express();
     this.port = port;
     this.setupMiddleware();
