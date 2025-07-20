@@ -1,9 +1,65 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Score Counter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#667eea" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="积分器" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>积分器</title>
+
   </head>
-  <body></body>
+  <body>
+    <div id="app">
+      <!-- 头部区域 -->
+      <header class="header">
+        <div class="room-id">房间ID: <span id="roomId">-</span></div>
+        <button id="recreateRoom" class="btn btn-primary">
+          重新创建房间
+        </button>
+      </header>
+
+      <!-- 主要内容区域 -->
+      <main class="main">
+        <!-- 日志区域 -->
+        <div class="logs-container">
+          <h3>积分记录</h3>
+          <div id="logs" class="logs"></div>
+        </div>
+
+        <!-- 成员区域 -->
+        <div class="members-container">
+          <div class="members-header">
+            <h3>成员列表</h3>
+            <div id="confirmSection" class="confirm-section" style="display: none">
+              <button id="cancelChanges" class="btn btn-secondary">
+                取消
+              </button>
+              <button id="confirmChanges" class="btn btn-success">
+                确认修改
+              </button>
+            </div>
+          </div>
+          <div id="members" class="members"></div>
+        </div>
+      </main>
+
+      <!-- 模态框 -->
+      <div id="modal" class="modal" style="display: none">
+        <div class="modal-content">
+          <div id="modalBody"></div>
+        </div>
+      </div>
+
+      <!-- 移动端底部导航提示 -->
+      <div class="mobile-tips" style="display: none">
+        <div class="tip-content">
+          <p>提示：点击成员右侧的绿色按钮可以加分</p>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

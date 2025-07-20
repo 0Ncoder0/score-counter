@@ -1,0 +1,447 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 头部样式 */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.room-id {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.room-id span {
+  font-weight: 600;
+  color: #fff;
+}
+
+/* 按钮样式 */
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* 主要内容区域 */
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  flex: 1;
+  min-height: 0;
+  height: calc(100vh - 70px);
+}
+
+.logs-container,
+.members-container {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.logs-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.members-container {
+  overflow-y: auto;
+  max-height: 50vh;
+}
+
+.logs-container h3,
+.members-container h3 {
+  margin-bottom: 8px;
+  color: #212529;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.members-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.members-header h3 {
+  line-height: 28px;
+  margin-bottom: 0;
+}
+
+/* 日志样式 */
+.logs {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+
+.log-item {
+  padding: 12px;
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.log-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.log-name {
+  font-weight: 700;
+  color: #212529;
+  font-size: 16px;
+}
+
+.log-details {
+  font-size: 14px;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+/* 成员样式 */
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px 8px 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.member-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #007bff, #28a745);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.member-name {
+  width: 50%;
+  font-weight: 700;
+  font-size: 14px;
+  color: #212529;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.member-score-section {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.member-score {
+  line-height: 32px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #007bff;
+  min-width: 45px;
+  text-align: center;
+  margin-right: auto;
+}
+
+.member-pending {
+  color: #dc3545;
+  font-size: 14px;
+  font-weight: 600;
+  background: #f8d7da;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.member-add-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+  color: white;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 32px;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.member-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* 确认区域 */
+.confirm-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.confirm-section .btn {
+  padding: 4px 16px;
+  font-size: 12px;
+  min-height: 28px;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 模态框样式 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: white;
+  padding: 20px 16px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+  margin: 16px;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  font-size: 15px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #007bff;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.modal-content button {
+  margin: 0 6px;
+  min-width: 90px;
+}
+
+/* 二维码样式 */
+.qr-code {
+  text-align: center;
+  margin: 20px 0;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.qr-code canvas {
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 移动端提示样式 */
+.mobile-tips {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-top: 2px solid #ffc107;
+  padding: 8px 12px;
+  z-index: 50;
+  animation: slideUp 0.5s ease-out;
+}
+
+.tip-content {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #856404;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Toast 消息动画 */
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
