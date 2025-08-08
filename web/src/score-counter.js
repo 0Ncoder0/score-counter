@@ -9,6 +9,7 @@ export class ScoreCounter {
     this.logs = [];
     this.pendingChanges = new Map(); // 存储待确认的分数变更
     this.isNameInputMode = false; // 跟踪是否在输入姓名模式
+    this.isSubmitting = false; // 跟踪是否正在提交确认修改
 
     // DOM 元素
     this.elements = {
@@ -897,6 +898,16 @@ export class ScoreCounter {
 
   confirmChanges = async () => {
     if (this.pendingChanges.size === 0) return;
+    
+    // 如果正在提交，直接返回，防止重复点击
+    if (this.isSubmitting) return;
+
+    // 设置提交状态
+    this.isSubmitting = true;
+    
+    // 禁用确认按钮
+    this.elements.confirmChanges.style.opacity = "0.6";
+    this.elements.confirmChanges.textContent = "提交中...";
 
     try {
       // 执行分数转移
@@ -938,6 +949,11 @@ export class ScoreCounter {
     } catch (error) {
       console.error("提交分数变更失败:", error);
       this.showToast("提交分数失败，请重试", "error");
+    } finally {
+      // 恢复按钮状态
+      this.isSubmitting = false;
+      this.elements.confirmChanges.style.opacity = "1";
+      this.elements.confirmChanges.textContent = "确认修改";
     }
   };
 
